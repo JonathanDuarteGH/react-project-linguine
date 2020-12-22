@@ -1,29 +1,55 @@
-import React from 'react';
-import { render } from "react-dom";
-import { ApolloProvider } from "@apollo/client";
-import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
-import './index.css';
-import Planets from "./components/Planets";
-import reportWebVitals from './reportWebVitals';
+import React from 'react'
+import { render } from "react-dom"
+import { BrowserRouter, Switch, Route } from "react-router-dom"
+import './index.css'
+import { ApolloProvider, ApolloClient, HttpLink, InMemoryCache, split } from "@apollo/client";
+import { getMainDefinition } from "@apollo/client/utilities";
+import { WebSocketLink } from "@apollo/link-ws";
+import Logo from "./styles/Logo"
+import Planet from "./components/Planet"
+import PlanetSearch from "./components/PlanetSearch"
 
-const url = "https://liberal-alien-90.hasura.app/v1/graphql"
+const httpUrl = "https://liberal-alien-90.hasura.app/v1/graphql"
+const wsUrl = "ws://liberal-alien-90.hasura.app/v1/graphql"
+
+const httpLink = new HttpLink({
+  uri: httpUrl,
+});
+
+const wsLink = new WebSocketLink({
+  uri: wsUrl,
+  options: {
+    reconnect: true,
+  },
+});
+
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === "OperationDefinition" &&
+      definition.operation === "subscription"
+    );
+  },
+  wsLink,
+  httpLink
+);
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  link: new HttpLink({
-    uri: url,
-  }),
+  link: splitLink,
 });
 
 const App = () => (
-  <ApolloProvider client={client}>
-    <Planets />
-  </ApolloProvider>
+  <BrowserRouter>
+    <ApolloProvider client={client}>
+      <Logo />
+      <Switch>
+        <Route path="/planet/:id" component={Planet} />
+        <Route path="/" component={PlanetSearch} />
+      </Switch>
+    </ApolloProvider>
+  </BrowserRouter>
 );
 
 render(<App />, document.getElementById("root"));
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
