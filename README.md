@@ -1,3 +1,23 @@
+# Mini Full-Stack Restaurant App
+This is a downsized full-stack app featuring a list of reviews from a dinning restaurant called Linguine.
+
+## Built With
+
+* [React.js](https://reactjs.org/)
+* [Javascript](https://www.javascript.com/)
+* CSS3
+* [GraphQL](https://graphql.org/)
+* [Hasura](https://hasura.io/)
+
+## Website Hosted On
+
+* [Heroku]()
+
+## License
+
+This project is subjected to the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
